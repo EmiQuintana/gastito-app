@@ -14,7 +14,7 @@ Primitivos reutilizables con tokens centralizados (`theme`) y stories:
 - `Card`
 - `Chip`
 
-Gastito va a importar desde `@/ui`. Todavía no hay pantallas de gastos.
+Gastito va a importar desde `@/ui`. Hoy la app ya consume esa librería: lista de gastos, formulario y persistencia local.
 
 ## Cómo ver los componentes
 
@@ -25,7 +25,13 @@ npm run storybook
 
 Abrí [http://localhost:6006](http://localhost:6006). No hace falta emulador: Storybook corre en el navegador con React Native Web.
 
-Expo queda listo para más adelante (`npm start`).
+## Cómo correr la app
+
+```bash
+npm start
+```
+
+Después abrí Expo Go, el emulador, o `npm run web`. Las pestañas **Inicio** y **Nuevo** guardan los gastos en el dispositivo.
 
 ## Por qué está separado
 
