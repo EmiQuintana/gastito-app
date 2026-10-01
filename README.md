@@ -1,5 +1,7 @@
 # Gastito
 
+Anotá tus gastos como si le escribieras a un amigo.
+
 App de gastos (en construcción) pensada para portfolio: navegación, persistencia local, API, notificaciones e IA. Este repo arranca por el diferencial: **una mini librería de UI con Storybook**.
 
 ## Mini librería (`src/ui`)
