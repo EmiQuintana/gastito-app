@@ -1,118 +1,210 @@
 import { router } from 'expo-router';
 import { useMemo } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { formatAmount, formatExpenseDate, type Expense } from '@/domain/expense';
+import { BudgetBar } from '@/components/BudgetBar';
+import {
+  formatAmount,
+  formatExpenseDate,
+  formatMonthYear,
+  isInCurrentMonth,
+  MONTHLY_BUDGET,
+  type Expense,
+} from '@/domain/expense';
 import { useExpenses } from '@/hooks/useExpenses';
-import { Button, Card, Text, theme } from '@/ui';
+import { BrandWordmark, Button, Text, categoryColor, colors, sizes, spacing } from '@/ui';
 
 export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
   const { expenses, loading } = useExpenses();
-  const total = useMemo(
-    () => expenses.reduce((sum, expense) => sum + expense.amount, 0),
+  const monthExpenses = useMemo(
+    () => expenses.filter((expense) => isInCurrentMonth(expense.createdAt)),
     [expenses],
   );
+  const total = useMemo(
+    () => monthExpenses.reduce((sum, expense) => sum + expense.amount, 0),
+    [monthExpenses],
+  );
+  const segments = useMemo(() => {
+    const totals = new Map<string, number>();
+    for (const expense of monthExpenses) {
+      totals.set(expense.category, (totals.get(expense.category) ?? 0) + expense.amount);
+    }
+    return [...totals.entries()]
+      .map(([category, amount]) => ({
+        key: category,
+        category,
+        amount,
+        color: categoryColor(category),
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  }, [monthExpenses]);
+
+  const remaining = MONTHLY_BUDGET - total;
+  const remainingCopy =
+    remaining >= 0
+      ? `Te quedan ${formatAmount(remaining)} de ${formatAmount(MONTHLY_BUDGET)}`
+      : `Te pasaste ${formatAmount(Math.abs(remaining))} de ${formatAmount(MONTHLY_BUDGET)}`;
 
   if (loading) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={theme.color.primary} />
+        <ActivityIndicator color={colors.ink} />
       </View>
     );
   }
 
   return (
-    <FlatList
-      data={expenses}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={styles.list}
-      ListHeaderComponent={
+    <SafeAreaView style={styles.screen} edges={['top']}>
+      <ScrollView
+        contentContainerStyle={[styles.content, { paddingTop: insets.top === 0 ? spacing.lg : spacing.sm }]}
+      >
         <View style={styles.header}>
-          <Text variant="display">Gastito</Text>
-          <Text tone="muted">Anotá tus gastos como si le escribieras a un amigo.</Text>
-          <Card style={styles.totalCard}>
-            <Text variant="label" tone="muted">
-              Total
-            </Text>
-            <Text variant="title">{formatAmount(total)}</Text>
-          </Card>
-        </View>
-      }
-      ListEmptyComponent={
-        <Card>
-          <Text variant="title">Todavía no hay gastos</Text>
-          <Text tone="muted" style={styles.emptyBody}>
-            Cargá el primero con monto, categoría y una nota corta.
+          <BrandWordmark />
+          <Text variant="secondary" tone="muted">
+            {formatMonthYear()}
           </Text>
-          <Button
-            label="Nuevo gasto"
-            onPress={() => router.push('/nuevo')}
-            style={styles.fullButton}
-          />
-        </Card>
-      }
-      renderItem={({ item }) => <ExpenseRow expense={item} />}
-    />
+        </View>
+
+        <View style={styles.summary}>
+          <Text variant="label" tone="muted">
+            Gastaste este mes
+          </Text>
+          <Text variant="amount" style={styles.total}>
+            {formatAmount(total)}
+          </Text>
+          <Text variant="secondary" tone="muted">
+            {remainingCopy}
+          </Text>
+        </View>
+
+        <BudgetBar segments={segments} total={total} budget={MONTHLY_BUDGET} />
+
+        {segments.length > 0 ? (
+          <View style={styles.legend}>
+            {segments.map((segment) => (
+              <View key={segment.key} style={styles.legendItem}>
+                <View style={[styles.dot, { backgroundColor: segment.color }]} />
+                <Text variant="caption" tone="muted">
+                  {segment.category} {formatAmount(segment.amount)}
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+
+        <Text variant="section" style={styles.section}>
+          Movimientos
+        </Text>
+
+        {monthExpenses.length === 0 ? (
+          <Text variant="secondary" tone="muted">
+            Todavía no hay movimientos este mes.
+          </Text>
+        ) : (
+          monthExpenses.map((expense, index) => (
+            <ExpenseRow
+              key={expense.id}
+              expense={expense}
+              isLast={index === monthExpenses.length - 1}
+            />
+          ))
+        )}
+
+        <Button
+          label="Agregar gasto"
+          fullWidth
+          onPress={() => router.push('/nuevo')}
+          style={styles.addButton}
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-function ExpenseRow({ expense }: { expense: Expense }) {
+function ExpenseRow({ expense, isLast }: { expense: Expense; isLast: boolean }) {
+  const title = expense.note.trim() || expense.category;
+
   return (
-    <Card style={styles.row}>
-      <View style={styles.rowTop}>
-        <Text variant="label" tone="muted">
-          {expense.category}
-        </Text>
+    <View style={[styles.row, !isLast && styles.rowDivider]}>
+      <View style={styles.rowText}>
+        <Text variant="bodyBold">{title}</Text>
         <Text variant="caption" tone="muted">
-          {formatExpenseDate(expense.createdAt)}
+          {expense.category} · {formatExpenseDate(expense.createdAt)}
         </Text>
       </View>
-      <Text variant="title">{formatAmount(expense.amount)}</Text>
-      {expense.note ? (
-        <Text tone="muted" style={styles.note}>
-          {expense.note}
-        </Text>
-      ) : null}
-    </Card>
+      <Text variant="bodyBold">{formatAmount(expense.amount)}</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.paper,
+  },
   centered: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: theme.color.background,
+    backgroundColor: colors.paper,
   },
-  list: {
-    padding: theme.space.xl,
-    gap: theme.space.md,
-    backgroundColor: theme.color.background,
-    flexGrow: 1,
+  content: {
+    paddingHorizontal: sizes.screenPadding,
+    paddingBottom: spacing.xl,
   },
   header: {
-    gap: theme.space.sm,
-    marginBottom: theme.space.sm,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    marginBottom: spacing.xl,
   },
-  totalCard: {
-    marginTop: theme.space.sm,
+  summary: {
+    gap: spacing.xs,
+    marginBottom: spacing.lg,
   },
-  emptyBody: {
-    marginTop: theme.space.sm,
-    marginBottom: theme.space.lg,
+  total: {
+    color: colors.coral,
   },
-  fullButton: {
-    alignSelf: 'stretch',
+  legend: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    marginTop: spacing.md,
+  },
+  legendItem: {
+    width: '48%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  section: {
+    marginTop: spacing.xl,
+    marginBottom: spacing.sm,
   },
   row: {
-    gap: theme.space.xs,
-  },
-  rowTop: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    paddingVertical: spacing.md,
   },
-  note: {
-    marginTop: theme.space.xs,
+  rowDivider: {
+    borderBottomWidth: 1,
+    borderBottomColor: colors.line,
+  },
+  rowText: {
+    flex: 1,
+    gap: 2,
+  },
+  addButton: {
+    marginTop: spacing.lg,
   },
 });

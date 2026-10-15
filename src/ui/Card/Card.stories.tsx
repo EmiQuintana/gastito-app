@@ -25,9 +25,9 @@ export const ExpensePreview: Story = {
     <Card>
       <View style={{ gap: 4 }}>
         <Text variant="label" tone="muted">
-          Súper
+          Comida
         </Text>
-        <Text variant="title">$ 5.000</Text>
+        <Text variant="bodyBold">$48.200</Text>
         <Text variant="caption" tone="muted">
           Hoy · lenguaje natural
         </Text>

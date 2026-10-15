@@ -8,14 +8,15 @@ import {
 } from 'react-native';
 
 import { Text } from '../Text/Text';
-import { theme } from '../theme';
+import { colors, radii, sizes } from '../theme';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'small' | 'ghost';
 
 export type ButtonProps = Omit<PressableProps, 'children' | 'style'> & {
   label: string;
   variant?: ButtonVariant;
   loading?: boolean;
+  fullWidth?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -23,6 +24,7 @@ export function Button({
   label,
   variant = 'primary',
   loading = false,
+  fullWidth = false,
   disabled,
   style,
   ...rest
@@ -38,18 +40,17 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         variantStyles[variant],
-        pressed && !isDisabled && pressedStyles[variant],
-        disabled && !loading && styles.disabled,
+        fullWidth && styles.fullWidth,
+        pressed && !isDisabled && styles.pressed,
+        isDisabled && styles.disabled,
         style,
       ]}
       {...rest}
     >
       {loading ? (
-        <ActivityIndicator
-          color={variant === 'primary' ? theme.color.onPrimary : theme.color.ink}
-        />
+        <ActivityIndicator color={variant === 'primary' ? colors.surface : colors.ink} />
       ) : (
-        <Text tone={variant === 'primary' ? 'inverse' : 'default'} variant="label" style={labelStyles[variant]}>
+        <Text variant="bodyBold" tone={variant === 'primary' ? 'inverse' : 'default'}>
           {label}
         </Text>
       )}
@@ -59,58 +60,47 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: 48,
-    paddingHorizontal: theme.space.lg,
-    borderRadius: theme.radius.md,
+    paddingHorizontal: 16,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'flex-start',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: 'transparent',
   },
+  fullWidth: {
+    alignSelf: 'stretch',
+  },
+  pressed: {
+    opacity: 0.88,
+  },
   disabled: {
-    backgroundColor: theme.color.disabled,
-    borderColor: theme.color.disabled,
+    opacity: 0.45,
   },
 });
 
 const variantStyles = StyleSheet.create({
   primary: {
-    backgroundColor: theme.color.primary,
-    borderColor: theme.color.primary,
+    backgroundColor: colors.ink,
+    borderColor: colors.ink,
+    borderRadius: radii.card,
+    minHeight: sizes.button,
   },
   secondary: {
-    backgroundColor: theme.color.accent,
-    borderColor: theme.color.accent,
+    backgroundColor: 'transparent',
+    borderColor: colors.ink,
+    borderRadius: radii.card,
+    minHeight: sizes.button,
+  },
+  small: {
+    backgroundColor: colors.surface,
+    borderColor: colors.ink,
+    borderRadius: radii.small,
+    minHeight: sizes.buttonSmall,
+    paddingHorizontal: 16,
   },
   ghost: {
     backgroundColor: 'transparent',
     borderColor: 'transparent',
-  },
-});
-
-const pressedStyles = StyleSheet.create({
-  primary: {
-    backgroundColor: theme.color.primaryPressed,
-    borderColor: theme.color.primaryPressed,
-  },
-  secondary: {
-    backgroundColor: theme.color.accentPressed,
-    borderColor: theme.color.accentPressed,
-  },
-  ghost: {
-    backgroundColor: theme.color.primaryMuted,
-  },
-});
-
-const labelStyles = StyleSheet.create({
-  primary: {
-    color: theme.color.onPrimary,
-  },
-  secondary: {
-    color: theme.color.ink,
-  },
-  ghost: {
-    color: theme.color.primary,
+    minHeight: sizes.buttonSmall,
   },
 });

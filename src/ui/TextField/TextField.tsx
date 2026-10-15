@@ -1,41 +1,31 @@
-import { StyleSheet, TextInput, type TextInputProps, View } from 'react-native';
+import { Platform, StyleSheet, TextInput, type TextInputProps, View } from 'react-native';
 
 import { Text } from '../Text/Text';
-import { theme } from '../theme';
+import { colors, fonts, radii, spacing } from '../theme';
 
 export type TextFieldProps = Omit<TextInputProps, 'style'> & {
   label: string;
   error?: string;
 };
 
-export function TextField({
-  label,
-  error,
-  editable = true,
-  keyboardType,
-  ...rest
-}: TextFieldProps) {
+export function TextField({ label, error, editable = true, keyboardType, ...rest }: TextFieldProps) {
   const hasError = Boolean(error);
 
   return (
     <View style={styles.wrap}>
-      <Text variant="label" style={styles.label}>
+      <Text variant="label" tone="muted">
         {label}
       </Text>
       <TextInput
         accessibilityLabel={label}
         editable={editable}
         keyboardType={keyboardType}
-        placeholderTextColor={theme.color.muted}
-        style={[
-          styles.input,
-          hasError && styles.inputError,
-          !editable && styles.inputDisabled,
-        ]}
+        placeholderTextColor={colors.grey}
+        style={[styles.input, hasError && styles.inputError, !editable && styles.inputDisabled]}
         {...rest}
       />
       {hasError ? (
-        <Text tone="danger" variant="caption" accessibilityLiveRegion="polite">
+        <Text variant="caption" accessibilityLiveRegion="polite">
           {error}
         </Text>
       ) : null}
@@ -45,29 +35,26 @@ export function TextField({
 
 const styles = StyleSheet.create({
   wrap: {
-    gap: theme.space.xs,
+    gap: spacing.xs,
     width: '100%',
   },
-  label: {
-    color: theme.color.ink,
-  },
   input: {
-    minHeight: 48,
+    minHeight: 52,
     borderWidth: 1,
-    borderColor: theme.color.border,
-    borderRadius: theme.radius.md,
-    paddingHorizontal: theme.space.md,
-    backgroundColor: theme.color.surface,
-    color: theme.color.ink,
-    fontFamily: theme.fontFamily.regular,
-    fontSize: theme.fontSize.body,
+    borderColor: colors.line,
+    borderRadius: radii.input,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.surface,
+    color: colors.ink,
+    fontFamily: fonts.medium,
+    fontSize: 16,
+    ...(Platform.OS === 'web' ? { fontWeight: '500' as const } : null),
   },
   inputError: {
-    borderColor: theme.color.danger,
-    backgroundColor: theme.color.dangerMuted,
+    borderColor: colors.coral,
   },
   inputDisabled: {
-    backgroundColor: theme.color.disabled,
-    color: theme.color.disabledText,
+    backgroundColor: colors.line,
+    color: colors.grey,
   },
 });

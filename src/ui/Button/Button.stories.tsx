@@ -18,11 +18,15 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Primary: Story = {
-  args: { variant: 'primary' },
+  args: { variant: 'primary', fullWidth: true },
 };
 
 export const Secondary: Story = {
-  args: { variant: 'secondary', label: 'Cancelar' },
+  args: { variant: 'secondary', label: 'Cancelar', fullWidth: true },
+};
+
+export const Small: Story = {
+  args: { variant: 'small', label: 'Cancelar' },
 };
 
 export const Ghost: Story = {
@@ -30,9 +34,9 @@ export const Ghost: Story = {
 };
 
 export const Loading: Story = {
-  args: { loading: true },
+  args: { loading: true, fullWidth: true },
 };
 
 export const Disabled: Story = {
-  args: { disabled: true },
+  args: { disabled: true, fullWidth: true },
 };

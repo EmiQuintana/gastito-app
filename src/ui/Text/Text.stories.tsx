@@ -15,12 +15,16 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Display: Story = {
-  args: { variant: 'display', children: 'Tus gastos, claros' },
+export const Amount: Story = {
+  args: { variant: 'amount', children: '$193.700' },
 };
 
 export const Title: Story = {
-  args: { variant: 'title', children: 'Octubre 2026' },
+  args: { variant: 'title', children: 'Nuevo gasto' },
+};
+
+export const Section: Story = {
+  args: { variant: 'section', children: 'Movimientos' },
 };
 
 export const Body: Story = {
@@ -28,13 +32,9 @@ export const Body: Story = {
 };
 
 export const Caption: Story = {
-  args: { variant: 'caption', tone: 'muted', children: 'Los montos están en ARS' },
+  args: { variant: 'caption', tone: 'muted', children: 'Comida · 14 oct' },
 };
 
 export const Label: Story = {
-  args: { variant: 'label', children: 'Monto' },
-};
-
-export const Danger: Story = {
-  args: { tone: 'danger', children: 'El monto es obligatorio' },
+  args: { variant: 'label', tone: 'muted', children: 'Monto' },
 };

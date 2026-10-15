@@ -1,16 +1,9 @@
-import {
-  Figtree_400Regular,
-  Figtree_500Medium,
-  Figtree_600SemiBold,
-  Figtree_700Bold,
-  useFonts,
-} from '@expo-google-fonts/figtree';
+import { Figtree_500Medium, Figtree_700Bold, Figtree_800ExtraBold, useFonts } from '@expo-google-fonts/figtree';
 
 export const figtreeFaces = {
-  Figtree_400Regular,
   Figtree_500Medium,
-  Figtree_600SemiBold,
   Figtree_700Bold,
+  Figtree_800ExtraBold,
 };
 
 export function useGastitoFonts() {

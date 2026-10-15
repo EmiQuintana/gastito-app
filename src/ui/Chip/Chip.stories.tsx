@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
 import { fn } from 'storybook/test';
 import { View } from 'react-native';
 
+import { categoryColor } from '../theme';
 import { Chip } from './Chip';
 
 const meta = {
@@ -9,7 +10,7 @@ const meta = {
   component: Chip,
   tags: ['autodocs'],
   args: {
-    label: 'Súper',
+    label: 'Comida',
     onPress: fn(),
   },
 } satisfies Meta<typeof Chip>;
@@ -21,7 +22,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 
 export const Selected: Story = {
-  args: { selected: true },
+  args: { selected: true, color: categoryColor('Comida') },
 };
 
 export const Disabled: Story = {
@@ -31,10 +32,11 @@ export const Disabled: Story = {
 export const Categories: Story = {
   render: () => (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-      <Chip label="Súper" selected onPress={fn()} />
-      <Chip label="Transporte" onPress={fn()} />
-      <Chip label="Comida" onPress={fn()} />
-      <Chip label="Ocio" onPress={fn()} />
+      <Chip label="Comida" color={categoryColor('Comida')} selected onPress={fn()} />
+      <Chip label="Transporte" color={categoryColor('Transporte')} onPress={fn()} />
+      <Chip label="Ocio" color={categoryColor('Ocio')} onPress={fn()} />
+      <Chip label="Otros" color={categoryColor('Otros')} onPress={fn()} />
+      <Chip label="Hogar" color={categoryColor('Hogar')} onPress={fn()} />
     </View>
   ),
 };
