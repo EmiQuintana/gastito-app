@@ -13,7 +13,7 @@ import {
   type Expense,
 } from '@/domain/expense';
 import { useExpenses } from '@/hooks/useExpenses';
-import { BrandWordmark, Button, Text, categoryColor, colors, sizes, spacing } from '@/ui';
+import { BrandWordmark, Button, Card, Text, categoryColor, colors, sizes, spacing } from '@/ui';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -57,42 +57,42 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.screen} edges={['top']}>
-      <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top === 0 ? spacing.lg : spacing.sm }]}
-      >
-        <View style={styles.header}>
-          <BrandWordmark />
-          <Text variant="secondary" tone="muted">
-            {formatMonthYear()}
-          </Text>
-        </View>
+      <View style={[styles.header, { paddingTop: insets.top === 0 ? spacing.lg : spacing.sm }]}>
+        <BrandWordmark />
+        <Text variant="secondary" tone="muted">
+          {formatMonthYear()}
+        </Text>
+      </View>
 
-        <View style={styles.summary}>
-          <Text variant="label" tone="muted">
-            Gastaste este mes
-          </Text>
-          <Text variant="amount" style={styles.total}>
-            {formatAmount(total)}
-          </Text>
-          <Text variant="secondary" tone="muted">
-            {remainingCopy}
-          </Text>
-        </View>
-
-        <BudgetBar segments={segments} total={total} budget={MONTHLY_BUDGET} />
-
-        {segments.length > 0 ? (
-          <View style={styles.legend}>
-            {segments.map((segment) => (
-              <View key={segment.key} style={styles.legendItem}>
-                <View style={[styles.dot, { backgroundColor: segment.color }]} />
-                <Text variant="caption" tone="muted">
-                  {segment.category} {formatAmount(segment.amount)}
-                </Text>
-              </View>
-            ))}
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.content}>
+        <Card style={styles.summaryCard}>
+          <View style={styles.summary}>
+            <Text variant="label" tone="muted">
+              Gastaste este mes
+            </Text>
+            <Text variant="amount" style={styles.total}>
+              {formatAmount(total)}
+            </Text>
+            <Text variant="secondary" tone="muted">
+              {remainingCopy}
+            </Text>
           </View>
-        ) : null}
+
+          <BudgetBar segments={segments} total={total} budget={MONTHLY_BUDGET} />
+
+          {segments.length > 0 ? (
+            <View style={styles.legend}>
+              {segments.map((segment) => (
+                <View key={segment.key} style={styles.legendItem}>
+                  <View style={[styles.dot, { backgroundColor: segment.color }]} />
+                  <Text variant="caption" tone="muted">
+                    {segment.category} {formatAmount(segment.amount)}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
+        </Card>
 
         <Text variant="section" style={styles.section}>
           Movimientos
@@ -112,13 +112,11 @@ export default function HomeScreen() {
           ))
         )}
 
-        <Button
-          label="Agregar gasto"
-          fullWidth
-          onPress={() => router.push('/nuevo')}
-          style={styles.addButton}
-        />
       </ScrollView>
+
+      <View style={styles.footer}>
+        <Button label="Agregar gasto" fullWidth onPress={() => router.push('/nuevo')} />
+      </View>
     </SafeAreaView>
   );
 }
@@ -150,20 +148,27 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: colors.paper,
   },
+  scroll: {
+    flex: 1,
+  },
   content: {
     paddingHorizontal: sizes.screenPadding,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.lg,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
-    marginBottom: spacing.xl,
+    paddingHorizontal: sizes.screenPadding,
+    paddingBottom: spacing.xl,
+    backgroundColor: colors.paper,
+  },
+  summaryCard: {
+    gap: spacing.lg,
   },
   summary: {
     gap: spacing.xs,
-    marginBottom: spacing.lg,
   },
   total: {
     color: colors.coral,
@@ -172,7 +177,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
-    marginTop: spacing.md,
   },
   legendItem: {
     width: '48%',
@@ -204,7 +208,9 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: 2,
   },
-  addButton: {
-    marginTop: spacing.lg,
+  footer: {
+    paddingHorizontal: sizes.screenPadding,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
   },
 });
