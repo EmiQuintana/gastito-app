@@ -12,7 +12,7 @@ import {
   type ExpenseCategory,
 } from '@/domain/expense';
 import { saveExpense } from '@/storage/expenseStorage';
-import { Button, Chip, Text, TextField, categoryColor, colors, sizes, spacing, type } from '@/ui';
+import { Button, Chip, Text, TextField, categoryColor, colors, radii, sizes, spacing, type } from '@/ui';
 
 export default function NewExpenseScreen() {
   const [amount, setAmount] = useState('');
@@ -61,7 +61,7 @@ export default function NewExpenseScreen() {
     }
   }
 
-  const amountLabel = amount ? formatAmount(Number(amount)) : '';
+  const amountLabel = amount ? formatAmount(Number(amount)).replace('$', '') : '';
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
@@ -69,33 +69,41 @@ export default function NewExpenseScreen() {
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
+        <View style={[styles.header, { paddingTop: insets.top === 0 ? spacing.lg : spacing.sm }]}>
+          <Text variant="title" style={styles.title}>
+            Nuevo gasto
+          </Text>
+          <Button
+            label="Cancelar"
+            variant="small"
+            onPress={onCancel}
+            style={{ backgroundColor: 'transparent' }}
+          />
+        </View>
+
         <ScrollView
-          contentContainerStyle={[
-            styles.content,
-            { paddingTop: insets.top === 0 ? spacing.lg : spacing.sm },
-          ]}
+          style={styles.flex}
+          contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.header}>
-            <Text variant="title" style={styles.title}>
-              Nuevo gasto
-            </Text>
-            <Button label="Cancelar" variant="small" onPress={onCancel} />
-          </View>
-
           <View style={styles.block}>
             <Text variant="label" tone="muted">
               Monto
             </Text>
-            <TextInput
-              accessibilityLabel="Monto"
-              value={amountLabel}
-              onChangeText={onAmountChange}
-              placeholder="$0"
-              placeholderTextColor={colors.grey}
-              keyboardType="number-pad"
-              style={styles.amount}
-            />
+            <View style={styles.amountRow}>
+              <Text style={styles.amountCurrency}>$</Text>
+              <View style={styles.amountGap} />
+              <TextInput
+                accessibilityLabel="Monto"
+                value={amountLabel}
+                onChangeText={onAmountChange}
+                placeholder="0"
+                placeholderTextColor={colors.grey}
+                keyboardType="number-pad"
+                style={styles.amountInput}
+              />
+            </View>
+            <View style={styles.amountLine} />
             {amountError ? (
               <Text variant="caption" accessibilityLiveRegion="polite">
                 {amountError}
@@ -131,9 +139,13 @@ export default function NewExpenseScreen() {
             <Text variant="label" tone="muted">
               Fecha
             </Text>
-            <Text variant="body">{formatTodayLabel()}</Text>
+            <View style={styles.dateField}>
+              <Text variant="body">{formatTodayLabel()}</Text>
+            </View>
           </View>
+        </ScrollView>
 
+        <View style={styles.footer}>
           <Button
             label="Guardar gasto"
             fullWidth
@@ -141,9 +153,8 @@ export default function NewExpenseScreen() {
             onPress={() => {
               void onSubmit();
             }}
-            style={styles.save}
           />
-        </ScrollView>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -157,37 +168,76 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
-  content: {
-    paddingHorizontal: sizes.screenPadding,
-    paddingBottom: spacing.xl,
-    gap: spacing.lg,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
+    paddingHorizontal: sizes.screenPadding,
+    paddingBottom: spacing.lg,
+    backgroundColor: colors.paper,
   },
   title: {
     flex: 1,
   },
-  block: {
-    gap: spacing.sm,
+  content: {
+    paddingHorizontal: sizes.screenPadding,
+    paddingBottom: spacing.lg,
+    gap: spacing.lg,
   },
-  amount: {
+  block: {
+    gap: spacing.xs,
+  },
+  amountRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    width: '100%',
+    minWidth: 0,
+  },
+  amountCurrency: {
     ...type.amount,
     color: colors.coral,
-    padding: 0,
+  },
+  amountGap: {
+    width: spacing.sm,
+    alignSelf: 'center',
+  },
+  amountInput: {
+    ...type.amount,
+    flex: 1,
+    flexShrink: 1,
+    minWidth: 0,
+    color: colors.ink,
     margin: 0,
+    padding: 0,
     borderWidth: 0,
     backgroundColor: 'transparent',
+    ...(Platform.OS === 'web' ? { outlineWidth: 0 } : null),
+  },
+  amountLine: {
+    height: 2,
+    backgroundColor: colors.coral,
+    marginTop: spacing.xs,
   },
   chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
+    marginTop: spacing.xs,
   },
-  save: {
-    marginTop: spacing.sm,
+  dateField: {
+    minHeight: 52,
+    borderWidth: 1,
+    borderColor: colors.line,
+    borderRadius: radii.input,
+    paddingHorizontal: spacing.lg,
+    backgroundColor: colors.surface,
+    justifyContent: 'center',
+  },
+  footer: {
+    paddingHorizontal: sizes.screenPadding,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
+    backgroundColor: colors.paper,
   },
 });

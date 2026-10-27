@@ -1,4 +1,4 @@
-export const EXPENSE_CATEGORIES = ['Comida', 'Transporte', 'Ocio', 'Otros', 'Hogar'] as const;
+export const EXPENSE_CATEGORIES = ['Comida', 'Transporte', 'Hogar', 'Ocio', 'Otros'] as const;
 
 export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
 

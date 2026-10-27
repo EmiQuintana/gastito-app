@@ -116,7 +116,11 @@ export function categoryColor(category: string) {
 }
 
 export function textOnFill(fill: string) {
-  return fill.toLowerCase() === colors.ink.toLowerCase() ? colors.surface : colors.ink;
+  const normalized = fill.toLowerCase();
+  if (normalized === colors.ink.toLowerCase() || normalized === colors.coral.toLowerCase()) {
+    return colors.surface;
+  }
+  return colors.ink;
 }
 
 export const theme = {

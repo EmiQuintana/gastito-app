@@ -22,7 +22,7 @@ export default function RootLayout() {
           }}
         >
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="nuevo" options={{ presentation: 'modal', animation: 'slide_from_bottom' }} />
+          <Stack.Screen name="nuevo" options={{ animation: 'fade' }} />
         </Stack>
       </View>
     </View>

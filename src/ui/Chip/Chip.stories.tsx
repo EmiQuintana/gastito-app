@@ -34,9 +34,9 @@ export const Categories: Story = {
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
       <Chip label="Comida" color={categoryColor('Comida')} selected onPress={fn()} />
       <Chip label="Transporte" color={categoryColor('Transporte')} onPress={fn()} />
+      <Chip label="Hogar" color={categoryColor('Hogar')} onPress={fn()} />
       <Chip label="Ocio" color={categoryColor('Ocio')} onPress={fn()} />
       <Chip label="Otros" color={categoryColor('Otros')} onPress={fn()} />
-      <Chip label="Hogar" color={categoryColor('Hogar')} onPress={fn()} />
     </View>
   ),
 };
