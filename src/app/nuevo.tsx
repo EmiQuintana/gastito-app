@@ -11,6 +11,8 @@ import {
   parseAmount,
   type ExpenseCategory,
 } from '@/domain/expense';
+import { ExpenseNotice } from '@/components/ExpenseNotice';
+import { publishSavedExpense } from '@/state/savedExpenseNotice';
 import { saveExpense } from '@/storage/expenseStorage';
 import { Button, Chip, Text, TextField, categoryColor, colors, radii, sizes, spacing, type } from '@/ui';
 
@@ -19,6 +21,7 @@ export default function NewExpenseScreen() {
   const [note, setNote] = useState('');
   const [category, setCategory] = useState<ExpenseCategory>('Comida');
   const [amountError, setAmountError] = useState<string | undefined>();
+  const [saveFailed, setSaveFailed] = useState(false);
   const [saving, setSaving] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -37,17 +40,27 @@ export default function NewExpenseScreen() {
       return;
     }
 
+    const expense = {
+      id: createExpenseId(),
+      amount: parsed,
+      category,
+      note: note.trim(),
+      createdAt: new Date().toISOString(),
+    };
+
     setAmountError(undefined);
+    setSaveFailed(false);
     setSaving(true);
     try {
-      await saveExpense({
-        id: createExpenseId(),
-        amount: parsed,
-        category,
-        note: note.trim(),
-        createdAt: new Date().toISOString(),
-      });
-      router.back();
+      await saveExpense(expense);
+      publishSavedExpense(expense);
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace('/');
+      }
+    } catch {
+      setSaveFailed(true);
     } finally {
       setSaving(false);
     }
@@ -146,6 +159,13 @@ export default function NewExpenseScreen() {
         </ScrollView>
 
         <View style={styles.footer}>
+          {saveFailed ? (
+            <ExpenseNotice
+              tone="error"
+              title="No se pudo guardar"
+              detail="El gasto no se guardó. Intentá de nuevo."
+            />
+          ) : null}
           <Button
             label="Guardar gasto"
             fullWidth
@@ -238,6 +258,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: sizes.screenPadding,
     paddingTop: spacing.sm,
     paddingBottom: spacing.sm,
+    gap: spacing.sm,
     backgroundColor: colors.paper,
   },
 });

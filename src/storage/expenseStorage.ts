@@ -25,3 +25,9 @@ export async function saveExpense(expense: Expense) {
   const expenses = await loadExpenses();
   await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify([expense, ...expenses]));
 }
+
+export async function deleteExpense(id: string) {
+  const expenses = await loadExpenses();
+  const next = expenses.filter((expense) => expense.id !== id);
+  await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+}
