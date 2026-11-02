@@ -45,6 +45,55 @@ export function isInCurrentMonth(iso: string, now = new Date()) {
   return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
 }
 
+export function startOfMonth(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+export function addMonths(date: Date, count: number) {
+  return new Date(date.getFullYear(), date.getMonth() + count, 1);
+}
+
+export function isInMonth(iso: string, month: Date) {
+  const date = new Date(iso);
+  return date.getFullYear() === month.getFullYear() && date.getMonth() === month.getMonth();
+}
+
+export function firstHistoryMonth(dates: string[], now = new Date()) {
+  const current = startOfMonth(now);
+  let first = addMonths(current, -11);
+  for (const iso of dates) {
+    const month = startOfMonth(new Date(iso));
+    if (month.getTime() < first.getTime()) {
+      first = month;
+    }
+  }
+  return first;
+}
+
+export function sharePercents(amounts: number[]) {
+  const total = amounts.reduce((sum, amount) => sum + amount, 0);
+  if (total <= 0) {
+    return amounts.map(() => 0);
+  }
+
+  const exact = amounts.map((amount) => (amount / total) * 100);
+  const floors = exact.map((value) => Math.floor(value));
+  let leftover = 100 - floors.reduce((sum, value) => sum + value, 0);
+  const order = exact
+    .map((value, index) => ({ index, fraction: value - (floors[index] ?? 0) }))
+    .sort((a, b) => b.fraction - a.fraction || a.index - b.index);
+
+  for (const item of order) {
+    if (leftover <= 0) {
+      break;
+    }
+    floors[item.index] = (floors[item.index] ?? 0) + 1;
+    leftover -= 1;
+  }
+
+  return floors;
+}
+
 export function parseAmount(raw: string) {
   const normalized = raw.replace(/\s/g, '').replace(/\./g, '').replace(',', '.');
   const value = Number(normalized);

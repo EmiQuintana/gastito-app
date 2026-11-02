@@ -1,6 +1,6 @@
 import { router, useFocusEffect } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Image, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BudgetBar } from '@/components/BudgetBar';
@@ -21,6 +21,8 @@ import {
 } from '@/state/savedExpenseNotice';
 import { deleteExpense } from '@/storage/expenseStorage';
 import { BrandWordmark, Button, Card, Text, categoryColor, colors, radii, sizes, spacing } from '@/ui';
+
+const EMPTY_RING = require('../../../assets/brand/Inicio-vacío-selection.webp');
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -128,10 +130,13 @@ export default function HomeScreen() {
             </Card>
           </View>
           <View style={styles.empty}>
-            <View style={styles.emptyRing}>
-              <View style={styles.emptyRingGap} />
-            </View>
-            <Text variant="section" style={styles.emptyTitle}>
+            <Image
+              accessible={false}
+              source={EMPTY_RING}
+              resizeMode="contain"
+              style={styles.emptyRing}
+            />
+            <Text variant="heading" style={styles.emptyTitle}>
               Todavía no hay gastos
             </Text>
             <Text variant="secondary" tone="muted" style={styles.emptyBody}>
@@ -310,21 +315,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   emptyRing: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 7,
-    borderColor: '#D8D3CB',
+    width: 80,
+    height: 80,
     marginBottom: spacing.md,
-  },
-  emptyRingGap: {
-    position: 'absolute',
-    top: -3,
-    right: 10,
-    width: 16,
-    height: 14,
-    backgroundColor: colors.paper,
-    transform: [{ rotate: '28deg' }],
   },
   emptyTitle: {
     textAlign: 'center',
